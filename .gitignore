@@ -1,0 +1,34 @@
+# ==============================================
+# Flex & Bison Generated Files
+# ==============================================
+# Bison output
+*.tab.c
+*.tab.h
+*.output
+
+# Flex output
+lex.yy.c
+lex.yy.h
+
+# ==============================================
+# Build Outputs
+# ==============================================
+# Executables
+mini_llama
+a.out
+*.exe
+
+# Object files
+*.o
+*.obj
+
+# ==============================================
+# System / IDE Temporary Files
+# ==============================================
+.DS_Store
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+*.dSYM/
