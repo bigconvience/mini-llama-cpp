@@ -116,7 +116,8 @@ void test_rope()
     u32 pos = 5;
     u32 dim = 8;
     u32 head_dim = 8;
-
+    
+    // Apply RoPE transformation to Q and K vectors
     rope(q, k, pos, dim, head_dim);
 
     printf("Rotated Q vector: ");

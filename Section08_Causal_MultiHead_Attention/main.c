@@ -127,35 +127,46 @@ void test_rope()
  */
 void test_causal_mha()
 {
+    // Print unit test header to console
     printf("\n[Causal Multi-Head Attention Unit Test]\n");
+    // Define tensor shape: single token, hidden dimension = 8
     u32 vec_shape[] = {1, 8};
+    // Allocate tensor for query vector
     Tensor* q = tensor_create(2, vec_shape);
+    // Allocate tensor for key vector
     Tensor* k = tensor_create(2, vec_shape);
+    // Allocate tensor for value vector
     Tensor* v = tensor_create(2, vec_shape);
+    // Allocate tensor to store attention output result
     Tensor* out = tensor_create(2, vec_shape);
 
-    // Fill simple test data
+    // Fill sequential numeric test data to Q/K/V tensors
     for(u32 i = 0; i < 8; i++){
         q->data[i] = (f32)i;
         k->data[i] = (f32)i;
         v->data[i] = (f32)i;
     }
 
+    // Declare KV Cache storage structure
     KVCache cache;
+    // Initialize KV Cache with hidden dim 8 and max sequence length
     kv_cache_init(&cache, 8, MAX_SEQ_LEN);
 
-    // Simulate position 0 token forward pass
+    // Run causal MHA forward pass for token at position 0, single attention head
     causal_mha(q, k, v, &cache, out, 0, 1);
+    // Print computed attention output vector of position 0
     printf("Attention output at pos 0: ");
     for(int i = 0; i < 8; i++){
         printf("%.2f ", out->data[i]);
     }
     printf("\n");
 
+    // Free dynamically allocated tensor memory to avoid memory leaks
     tensor_free(q);
     tensor_free(k);
     tensor_free(v);
     tensor_free(out);
+    // Clear all cached key and value states for next test
     kv_cache_reset(&cache);
 }
 

@@ -158,58 +158,81 @@ void test_causal_mha()
 
 /**
  * Unit test for text <-> token conversion
+ * Test the full tokenizer encode and decode workflow
  */
 void test_tokenizer()
 {
+    // Print test section title on console
     printf("\n[Tokenizer Unit Test]\n");
+    // Sample input sentence for tokenization test
     const char* prompt = "hello world how are you";
+    // Buffer to store converted integer token IDs
     u32 tokens[64];
+    // Convert plain text string into token ID array
     u32 token_cnt = text_to_tokens(prompt, tokens, 64);
+    // Print original input text and total number of generated tokens
     printf("Input text: %s\nToken count: %u\nToken IDs: ", prompt, token_cnt);
+    // Loop to print every token ID in sequence
     for(u32 i = 0; i < token_cnt; i++)
         printf("%u ", tokens[i]);
     printf("\n");
 
-    // Convert token back to text demo
+    // Demo of token decoding: convert single token ID back to readable word
     char buf[32];
+    // Decode the second token (index 1, BOS is index 0)
     token_to_text(tokens[1], buf, 32);
+    // Print decoded text matched with corresponding token ID
     printf("Token %u decode text: %s\n", tokens[1], buf);
 }
 
 /**
  * End-to-end autoregressive generation test
+ * Full pipeline test: tokenizer -> model forward -> autoregressive token generation
  */
 void test_autoregressive_generate()
 {
+    // Print test section header for generation pipeline
     printf("\n[Autoregressive Generation End-To-End Test]\n");
-    // TinyLlama static config
+    // Static hyperparameter configuration matching TinyLlama official setting
     LLaMAConfig cfg = {
-        .dim = 512,
-        .n_layers = 22,
-        .n_heads = 32,
-        .vocab_size = 32000,
-        .seq_len = MAX_SEQ_LEN
+        .dim = 512,          // Model hidden embedding dimension
+        .n_layers = 22,      // Total number of transformer decoder layers
+        .n_heads = 32,       // Number of multi-head attention heads
+        .vocab_size = 32000, // Total vocabulary size of LLaMA tokenizer
+        .seq_len = MAX_SEQ_LEN // Maximum supported context sequence length
     };
+    // Declare main LLM model instance
     LLaMAModel model;
+    // Initialize all model tensors and layers with above config
     llama_model_init(&model, &cfg);
 
+    // Declare KV cache instance for fast generation
     KVCache cache;
+    // Allocate memory for key/value cache storage
     kv_cache_init(&cache, cfg.dim, cfg.seq_len);
 
-    // Encode input prompt
+    // Raw user input prompt for chat test
     const char* user_prompt = "hello llama";
+    // Buffer to hold encoded input prompt token IDs
     u32 input_tokens[256];
+    // Convert input text into token sequence
     u32 in_cnt = text_to_tokens(user_prompt, input_tokens, 256);
 
+    // Output buffer storing full prompt + newly generated tokens
     u32 output_tokens[512];
+    // Run complete autoregressive generation, limit max 10 newly generated tokens
     u32 total = generate_autoregressive(&model, &cache, input_tokens, in_cnt, output_tokens, 10);
 
+    // Print total length of combined prompt + generated token sequence
     printf("Generated total token length: %u\nToken sequence: ", total);
+    // Print every token ID in the full output sequence
     for(u32 i = 0; i < total; i++)
         printf("%u ", output_tokens[i]);
     printf("\n");
 
+    // Release all dynamically allocated memory of model tensors
     llama_model_free(&model);
+    // Clear all cached attention key and value data
     kv_cache_reset(&cache);
 }
 

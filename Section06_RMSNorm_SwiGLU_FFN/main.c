@@ -84,10 +84,16 @@ void test_gguf_loader(const char* model_path)
 void test_rms_norm()
 {
     printf("\n[RMSNorm Unit Test]\n");
+    // Sample input vector
     f32 x[] = {1.0f, 2.0f, 3.0f, 4.0f};
+    // Uniform weight vector for simple testing
     f32 w[] = {1.0f, 1.0f, 1.0f, 1.0f};
     f32 out[4];
+
+    // Run RMSNorm calculation
     rms_norm(out, x, w, 4);
+
+    // Print normalized output values
     printf("Normalized vector: ");
     for (int i = 0; i < 4; i++)
         printf("%.4f ", out[i]);
@@ -100,9 +106,12 @@ void test_rms_norm()
 void test_swiglu()
 {
     printf("\n[SwiGLU Unit Test]\n");
+    // Sample input vectors for gate and up
     f32 gate[] = {1.0f, -1.0f, 2.0f, -2.0f};
     f32 up[]   = {2.0f, 3.0f, 1.0f, 4.0f};
     f32 out[4];
+
+    // Run SwiGLU calculation
     swiglu(out, gate, up, 4);
     printf("SwiGLU output vector: ");
     for (int i = 0; i < 4; i++)
